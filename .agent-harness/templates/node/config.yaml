@@ -1,0 +1,71 @@
+project:
+  name: "my-node-project"
+  type: node
+
+budgets:
+  bootstrap_chars: 2000
+  memory_query_full_chars: 500
+  memory_query_brief_chars: 200
+  memory_query_max_entries: 5
+  map_drill_chars: 1600
+
+memory:
+  max_entries: 200
+  decay_default: 0.05
+  decay_mistake: 0.02
+  prune_threshold: 0.1
+  access_bump: 0.3
+
+tests:
+  test_command: "npm test"
+  max_results: 20
+  plan_location: "docs/plans/"
+  auto_rules_check: true
+
+roles:
+  planner:
+    description: "Designs architecture and plans"
+    models: [claude-opus]
+    permissions:
+      file_write: false
+      file_create: true
+      shell_access: true
+      git_commit: false
+      git_push: false
+      install_deps: false
+    tools: [memory, map]
+    bootstrap:
+      sections: [session_handoff, diff_summary, project_map, conventions]
+      mistake_categories: [architecture, process]
+      map_detail: expanded
+
+  coder:
+    description: "Writes and modifies code"
+    models: [claude-sonnet, cursor-composer2]
+    permissions:
+      file_write: true
+      file_create: true
+      shell_access: true
+      git_commit: true
+      git_push: false
+      install_deps: false
+    tools: [memory, map, mistakes, test-results, rules]
+    bootstrap:
+      sections: [session_handoff, diff_summary, project_map, active_mistakes, conventions]
+      mistake_categories: [pattern, architecture]
+
+  reviewer:
+    description: "Reviews code for correctness and conventions"
+    models: [codex]
+    permissions:
+      file_write: true
+      file_create: false
+      shell_access: true
+      git_commit: false
+      git_push: false
+      install_deps: false
+    tools: [memory, mistakes, test-results, rules]
+    bootstrap:
+      sections: [session_handoff, diff_summary, active_mistakes, conventions]
+      mistake_categories: [pattern, process, architecture]
+      conventions_detail: expanded

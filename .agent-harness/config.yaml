@@ -1,0 +1,78 @@
+# Agent Harness Configuration
+# Copy this file to .agent-harness/config.yaml in each project and customize.
+
+project:
+  name: "my-project"
+  type: python  # ios-swift | python | node | nextjs
+
+# Token / character budgets
+budgets:
+  bootstrap_chars: 2000          # hard cap on bootstrap.md size
+  memory_query_full_chars: 500   # per-entry cap in full query mode
+  memory_query_brief_chars: 200  # per-entry cap in --brief mode
+  memory_query_max_entries: 5
+  map_drill_chars: 1600          # per detail file cap
+
+# Memory pruning
+memory:
+  max_entries: 200
+  decay_default: 0.05            # relevance lost per day (non-mistakes)
+  decay_mistake: 0.02            # relevance lost per day (mistakes, slower)
+  prune_threshold: 0.1           # entries below this are deleted
+  access_bump: 0.3               # relevance gained when an entry is queried
+
+# Test results
+tests:
+  test_command: "pytest tests/ -v"
+  max_results: 20                # keep last N test runs
+  plan_location: "docs/plans/"
+  auto_rules_check: true
+
+# Roles — define which models fill each role and what context they get
+roles:
+  planner:
+    description: "Designs architecture and plans"
+    models: [claude-opus]
+    permissions:
+      file_write: false
+      file_create: true
+      shell_access: true
+      git_commit: false
+      git_push: false
+      install_deps: false
+    tools: [memory, map]
+    bootstrap:
+      sections: [session_handoff, diff_summary, project_map, conventions]
+      mistake_categories: [architecture, process]
+      map_detail: expanded
+
+  coder:
+    description: "Writes and modifies code"
+    models: [claude-sonnet, cursor-composer2]
+    permissions:
+      file_write: true
+      file_create: true
+      shell_access: true
+      git_commit: true
+      git_push: false
+      install_deps: false
+    tools: [memory, map, mistakes, test-results, rules]
+    bootstrap:
+      sections: [session_handoff, diff_summary, project_map, active_mistakes, conventions]
+      mistake_categories: [pattern, architecture]
+
+  reviewer:
+    description: "Reviews code for correctness and conventions"
+    models: [codex]
+    permissions:
+      file_write: true
+      file_create: false
+      shell_access: true
+      git_commit: false
+      git_push: false
+      install_deps: false
+    tools: [memory, mistakes, test-results, rules]
+    bootstrap:
+      sections: [session_handoff, diff_summary, active_mistakes, conventions]
+      mistake_categories: [pattern, process, architecture]
+      conventions_detail: expanded

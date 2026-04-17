@@ -1,0 +1,20 @@
+# Harness generated files (project-specific, not versioned in the submodule)
+.agent-harness/context/bootstrap.md
+.agent-harness/context/.bootstrap-hash
+.agent-harness/context/session-handoff.md
+.agent-harness/context/detail/
+.agent-harness/memory/entries/
+.agent-harness/memory/index.yaml
+.agent-harness/logs/
+.agent-harness/scores/
+.agent-harness/.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS
+.DS_Store

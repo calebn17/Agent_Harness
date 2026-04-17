@@ -1,0 +1,26 @@
+version: 1
+rules:
+  - id: test-framework
+    scope: "tests/**"
+    rule: "Use pytest, never unittest"
+    severity: error
+
+  - id: imports-absolute
+    scope: "src/**"
+    rule: "All imports must be absolute, no relative imports"
+    severity: error
+
+  - id: no-console-log
+    scope: "**/*.py"
+    rule: "Use logging module, not print() in production code"
+    severity: warning
+
+  - id: type-hints
+    scope: "src/**"
+    rule: "Public functions must have type hints"
+    severity: warning
+
+  - id: no-bare-except
+    scope: "**/*.py"
+    rule: "No bare except: clauses — catch specific exceptions"
+    severity: error

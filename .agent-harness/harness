@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""Agent Harness CLI — token-efficient context layer for AI coding agents."""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Resolve harness root: .agent-harness/ directory containing this script
+HARNESS_DIR = Path(__file__).parent.resolve()
+PROJECT_ROOT = HARNESS_DIR.parent
+
+# Self-bootstrap: ensure scripts/ is importable regardless of how the CLI is invoked
+if str(HARNESS_DIR) not in sys.path:
+    sys.path.insert(0, str(HARNESS_DIR))
+
+
+def cmd_prep(args):
+    from scripts.gen_bootstrap import generate_bootstrap
+    from scripts.prune import prune_all
+    prune_all()
+    generate_bootstrap(role=args.role, worktree=args.worktree)
+
+
+def cmd_post(args):
+    from scripts.post_session import capture_handoff
+    capture_handoff()
+
+
+def cmd_memory(args):
+    from scripts.memory import memory_query, memory_save, memory_forget
+    if args.memory_cmd == "query":
+        memory_query(
+            topic=getattr(args, "topic", None),
+            files=getattr(args, "files", None),
+            brief=getattr(args, "brief", False),
+        )
+    elif args.memory_cmd == "save":
+        memory_save(
+            category=getattr(args, "category", "pattern"),
+            content=args.content,
+            files=getattr(args, "files", None),
+        )
+    elif args.memory_cmd == "forget":
+        memory_forget(entry_id=args.id)
+    else:
+        print(f"Unknown memory subcommand: {args.memory_cmd}", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_mistakes(args):
+    from scripts.memory import memory_query
+    memory_query(topic=None, files=args.files, categories=["mistake"], brief=args.brief)
+
+
+def cmd_map(args):
+    from scripts.map_cmd import map_drill, map_rebuild
+    if args.map_cmd == "drill":
+        map_drill(module=getattr(args, "module", ""))
+    elif args.map_cmd == "rebuild":
+        map_rebuild()
+    else:
+        print(f"Unknown map subcommand: {args.map_cmd}", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_rules(args):
+    from scripts.rules import rules_check
+    rules_check(files=getattr(args, "files", None), staged=getattr(args, "staged", False))
+
+
+def cmd_test(args):
+    from scripts.test_cmd import run_tests
+    run_tests()
+
+
+def cmd_parse_test_output(args):
+    from scripts.parse_tests import parse_stdin
+    parse_stdin()
+
+
+def cmd_test_results(args):
+    from scripts.test_cmd import query_results
+    query_results(path=args.path)
+
+
+def cmd_init(args):
+    from scripts.init_cmd import init_project
+    init_project(project_type=args.type)
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        prog="harness",
+        description="Agent Harness — token-efficient AI agent context layer",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # harness prep
+    p_prep = sub.add_parser("prep", help="Generate bootstrap.md for a session")
+    p_prep.add_argument("--role", default="coder", help="Agent role (planner|coder|reviewer)")
+    p_prep.add_argument("--worktree", default=None, help="Path to worktree (outputs bootstrap there)")
+    p_prep.set_defaults(func=cmd_prep)
+
+    # harness post
+    p_post = sub.add_parser("post", help="Capture session handoff after a session")
+    p_post.set_defaults(func=cmd_post)
+
+    # harness memory <subcommand>
+    p_mem = sub.add_parser("memory", help="Memory store operations")
+    mem_sub = p_mem.add_subparsers(dest="memory_cmd", required=True)
+
+    p_mq = mem_sub.add_parser("query", help="Query memory entries")
+    p_mq.add_argument("topic", nargs="?", default=None, help="Topic keyword")
+    p_mq.add_argument("--files", nargs="+", help="Filter by relevant file paths")
+    p_mq.add_argument("--brief", action="store_true", help="Compact output")
+    p_mem.set_defaults(func=cmd_memory)
+
+    p_ms = mem_sub.add_parser("save", help="Save a new memory entry")
+    p_ms.add_argument("content", help="Memory content")
+    p_ms.add_argument("--category", default="pattern",
+                      choices=["architecture", "pattern", "decision", "convention", "mistake"],
+                      help="Memory category")
+    p_ms.add_argument("--files", nargs="+", help="Relevant file paths")
+
+    p_mf = mem_sub.add_parser("forget", help="Mark entry for pruning")
+    p_mf.add_argument("id", help="Memory entry ID (e.g. mem-001)")
+
+    # harness mistakes
+    p_mistakes = sub.add_parser("mistakes", help="Query mistake memories for a file")
+    p_mistakes.add_argument("files", nargs="+", help="File paths to check mistakes for")
+    p_mistakes.add_argument("--brief", action="store_true")
+    p_mistakes.set_defaults(func=cmd_mistakes)
+
+    # harness map <subcommand>
+    p_map = sub.add_parser("map", help="Codebase map operations")
+    map_sub = p_map.add_subparsers(dest="map_cmd", required=True)
+
+    p_md = map_sub.add_parser("drill", help="Get detailed map for a module")
+    p_md.add_argument("module", help="Module path (e.g. src/auth)")
+
+    p_mr = map_sub.add_parser("rebuild", help="Full codebase map rescan")
+    p_map.set_defaults(func=cmd_map)
+
+    # harness rules check
+    p_rules = sub.add_parser("rules", help="Convention rules operations")
+    rules_sub = p_rules.add_subparsers(dest="rules_cmd", required=True)
+    p_rc = rules_sub.add_parser("check", help="Validate files against conventions")
+    p_rc.add_argument("--files", nargs="+", help="Files to check (default: all changed)")
+    p_rc.add_argument("--staged", action="store_true", help="Check only staged files")
+    p_rules.set_defaults(func=cmd_rules)
+
+    # harness test
+    p_test = sub.add_parser("test", help="Run tests and capture results")
+    p_test.set_defaults(func=cmd_test)
+
+    # harness parse-test-output
+    p_pto = sub.add_parser("parse-test-output", help="Parse test output from stdin")
+    p_pto.set_defaults(func=cmd_parse_test_output)
+
+    # harness test-results
+    p_tr = sub.add_parser("test-results", help="Query stored test results")
+    p_tr.add_argument("path", nargs="?", default=None, help="Filter by file path")
+    p_tr.set_defaults(func=cmd_test_results)
+
+    # harness init
+    p_init = sub.add_parser("init", help="Initialize harness in a project")
+    p_init.add_argument("--type", default="python",
+                        choices=["ios-swift", "python", "node", "nextjs"],
+                        help="Project type")
+    p_init.set_defaults(func=cmd_init)
+
+    return parser
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,26 @@
+version: 1
+rules:
+  - id: no-console-log
+    scope: "src/**"
+    rule: "No console.log in production code — use a logger (winston, pino, etc.)"
+    severity: error
+
+  - id: esm-imports
+    scope: "**/*.{js,mjs}"
+    rule: "Use ESM imports (import/export), not CommonJS (require/module.exports)"
+    severity: error
+
+  - id: no-var
+    scope: "**/*.{js,ts}"
+    rule: "Use const/let, never var"
+    severity: error
+
+  - id: error-handling
+    scope: "src/**"
+    rule: "All async functions must handle errors — no unhandled promise rejections"
+    severity: error
+
+  - id: env-vars
+    scope: "**"
+    rule: "Access env vars via process.env only — no hardcoded config values"
+    severity: warning

@@ -1,0 +1,31 @@
+version: 1
+rules:
+  - id: app-router
+    scope: "**"
+    rule: "Use Next.js App Router (app/ directory), not Pages Router"
+    severity: error
+
+  - id: server-components-default
+    scope: "app/**"
+    rule: "Components are Server Components by default — add 'use client' only when needed"
+    severity: warning
+
+  - id: no-console-log
+    scope: "**/*.{ts,tsx,js,jsx}"
+    rule: "No console.log in production code"
+    severity: error
+
+  - id: imports-absolute
+    scope: "**/*.{ts,tsx}"
+    rule: "Use absolute imports via tsconfig paths (@/), not relative imports"
+    severity: error
+
+  - id: env-vars
+    scope: "**"
+    rule: "Public env vars must be prefixed NEXT_PUBLIC_. Never expose secrets client-side."
+    severity: error
+
+  - id: image-component
+    scope: "app/**"
+    rule: "Use next/image instead of <img> for all images"
+    severity: warning

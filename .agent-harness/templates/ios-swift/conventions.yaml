@@ -1,0 +1,26 @@
+version: 1
+rules:
+  - id: no-force-unwrap
+    scope: "**/*.swift"
+    rule: "No force unwraps (!) — use guard let, if let, or ?? instead"
+    severity: error
+
+  - id: async-await
+    scope: "**/*.swift"
+    rule: "Use async/await for concurrency, not completion handlers (Swift 5.5+)"
+    severity: warning
+
+  - id: no-objc-dynamic
+    scope: "**/*.swift"
+    rule: "Avoid @objc dynamic unless required for Objective-C interop"
+    severity: warning
+
+  - id: test-naming
+    scope: "**/*Tests.swift"
+    rule: "Test methods must be prefixed with 'test'"
+    severity: error
+
+  - id: access-control
+    scope: "**/*.swift"
+    rule: "Use the most restrictive access control appropriate (private > internal > public)"
+    severity: warning
