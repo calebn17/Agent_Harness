@@ -1,26 +1,43 @@
-version: 1
+# Node.js project conventions
+# Edit for your project. Severity: error (blocks commit) | warning (advisory)
+
 rules:
-  - id: no-console-log
-    scope: "src/**"
-    rule: "No console.log in production code — use a logger (winston, pino, etc.)"
-    severity: error
-
-  - id: esm-imports
-    scope: "**/*.{js,mjs}"
-    rule: "Use ESM imports (import/export), not CommonJS (require/module.exports)"
-    severity: error
-
-  - id: no-var
-    scope: "**/*.{js,ts}"
-    rule: "Use const/let, never var"
-    severity: error
-
-  - id: error-handling
-    scope: "src/**"
-    rule: "All async functions must handle errors — no unhandled promise rejections"
-    severity: error
-
-  - id: env-vars
-    scope: "**"
-    rule: "Access env vars via process.env only — no hardcoded config values"
+  - id: node-esm-imports
+    scope: "**/*.{js,ts,mjs}"
+    rule: "Use ESM imports (import/export) — no require() in new files"
     severity: warning
+
+  - id: node-no-callback-style
+    scope: "**/*.{js,ts}"
+    rule: "Use async/await or Promises — no callback-style async patterns in new code"
+    severity: error
+
+  - id: node-no-sync-fs
+    scope: "src/**/*.{js,ts}"
+    rule: "Do not use fs.*Sync() in request handlers — use async fs/promises equivalents"
+    severity: error
+
+  - id: node-error-first-callbacks
+    scope: "**/*.{js,ts}"
+    rule: "When using callbacks, always check the error argument first"
+    severity: warning
+
+  - id: node-no-process-exit
+    scope: "src/**/*.{js,ts}"
+    rule: "Do not call process.exit() in library code — only in CLI entrypoints"
+    severity: error
+
+  - id: node-env-validation
+    scope: "src/**/*.{js,ts}"
+    rule: "Validate all process.env references at startup — never access env vars inline without a default or guard"
+    severity: warning
+
+  - id: node-no-console-log-production
+    scope: "src/**/*.{js,ts}"
+    rule: "No console.log() in production code paths — use structured logger"
+    severity: warning
+
+  - id: node-input-validation
+    scope: "src/**/*.{js,ts}"
+    rule: "Validate and sanitize all external inputs (request body, query params) before use"
+    severity: error

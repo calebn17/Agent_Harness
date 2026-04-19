@@ -1,26 +1,43 @@
-version: 1
+# Python project conventions
+# Edit for your project. Severity: error (blocks commit) | warning (advisory)
+
 rules:
-  - id: test-framework
-    scope: "tests/**"
-    rule: "Use pytest, never unittest"
-    severity: error
-
-  - id: imports-absolute
-    scope: "src/**"
-    rule: "All imports must be absolute, no relative imports"
-    severity: error
-
-  - id: no-console-log
+  - id: py-imports-stdlib-first
     scope: "**/*.py"
-    rule: "Use logging module, not print() in production code"
+    rule: "stdlib imports must come before third-party imports (isort order)"
     severity: warning
 
-  - id: type-hints
-    scope: "src/**"
-    rule: "Public functions must have type hints"
+  - id: py-no-bare-except
+    scope: "**/*.py"
+    rule: "Do not use bare 'except:' — always catch a specific exception type"
+    severity: error
+
+  - id: py-no-print-in-library
+    scope: "src/**/*.py"
+    rule: "No print() in library code — use logging module instead"
     severity: warning
 
-  - id: no-bare-except
+  - id: py-no-mutable-defaults
     scope: "**/*.py"
-    rule: "No bare except: clauses — catch specific exceptions"
+    rule: "Do not use mutable default arguments (list, dict, set) — use None and assign in body"
     severity: error
+
+  - id: py-type-hints-public-api
+    scope: "src/**/*.py"
+    rule: "All public functions and methods must have type hints"
+    severity: warning
+
+  - id: py-no-os-system
+    scope: "**/*.py"
+    rule: "Do not use os.system() — use subprocess.run() with check=True"
+    severity: error
+
+  - id: py-async-await-io
+    scope: "**/*.py"
+    rule: "I/O-bound operations in async functions must use await — no blocking calls"
+    severity: error
+
+  - id: py-test-naming
+    scope: "tests/**/*.py"
+    rule: "Test functions must be named test_<behavior>_<condition> (e.g. test_login_with_invalid_password)"
+    severity: warning

@@ -1,26 +1,53 @@
-version: 1
+# iOS/Swift project conventions
+# Edit for your project. Severity: error (blocks commit) | warning (advisory)
+
 rules:
-  - id: no-force-unwrap
+  - id: swift-no-force-unwrap
     scope: "**/*.swift"
-    rule: "No force unwraps (!) — use guard let, if let, or ?? instead"
+    rule: "Do not use force unwrap (!) — use guard let, if let, or ?? with a default"
     severity: error
 
-  - id: async-await
+  - id: swift-no-force-cast
     scope: "**/*.swift"
-    rule: "Use async/await for concurrency, not completion handlers (Swift 5.5+)"
+    rule: "Do not use force cast (as!) — use conditional cast (as?) with nil handling"
+    severity: error
+
+  - id: swift-main-thread-ui
+    scope: "**/*.swift"
+    rule: "All UIKit/SwiftUI updates must happen on the main thread — use @MainActor or DispatchQueue.main"
+    severity: error
+
+  - id: swift-no-global-state
+    scope: "**/*.swift"
+    rule: "Avoid global variables and singletons — prefer dependency injection"
     severity: warning
 
-  - id: no-objc-dynamic
+  - id: swift-prefer-structs
     scope: "**/*.swift"
-    rule: "Avoid @objc dynamic unless required for Objective-C interop"
+    rule: "Prefer structs over classes for value types — use classes only when reference semantics are needed"
     severity: warning
 
-  - id: test-naming
+  - id: swift-protocol-oriented
+    scope: "**/*.swift"
+    rule: "Define dependencies as protocols — concrete types injected at call site for testability"
+    severity: warning
+
+  - id: swift-async-await
+    scope: "**/*.swift"
+    rule: "Use async/await for asynchronous code — avoid GCD and completion handlers in new code"
+    severity: warning
+
+  - id: swift-test-naming
     scope: "**/*Tests.swift"
-    rule: "Test methods must be prefixed with 'test'"
+    rule: "Test methods must follow test_<unitUnderTest>_<condition>_<expectedResult> naming"
+    severity: warning
+
+  - id: swift-no-ui-in-viewmodel
+    scope: "**/*ViewModel.swift"
+    rule: "ViewModels must not import UIKit or SwiftUI — keep presentation logic framework-agnostic"
     severity: error
 
-  - id: access-control
+  - id: swift-accessibility
     scope: "**/*.swift"
-    rule: "Use the most restrictive access control appropriate (private > internal > public)"
+    rule: "Interactive UI elements must have accessibilityLabel and accessibilityIdentifier set"
     severity: warning

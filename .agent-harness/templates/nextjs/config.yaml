@@ -1,3 +1,6 @@
+# Agent Harness Configuration — Next.js template
+# Copy to .agent-harness/config.yaml and customize project.name.
+
 project:
   name: "my-nextjs-project"
   type: nextjs
@@ -17,7 +20,7 @@ memory:
   access_bump: 0.3
 
 tests:
-  test_command: "npm test"
+  test_command: "npx vitest run"
   max_results: 20
   plan_location: "docs/plans/"
   auto_rules_check: true

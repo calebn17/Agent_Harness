@@ -1,3 +1,6 @@
+# Agent Harness Configuration — Python template
+# Copy to .agent-harness/config.yaml and customize project.name.
+
 project:
   name: "my-python-project"
   type: python

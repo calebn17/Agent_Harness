@@ -1,31 +1,43 @@
-version: 1
+# Next.js project conventions
+# Edit for your project. Severity: error (blocks commit) | warning (advisory)
+
 rules:
-  - id: app-router
-    scope: "**"
-    rule: "Use Next.js App Router (app/ directory), not Pages Router"
+  - id: next-app-router-only
+    scope: "**/*.{ts,tsx}"
+    rule: "Use App Router (app/) — do not create pages/ directory routes"
     severity: error
 
-  - id: server-components-default
-    scope: "app/**"
-    rule: "Components are Server Components by default — add 'use client' only when needed"
+  - id: next-server-components-default
+    scope: "app/**/*.{ts,tsx}"
+    rule: "Components are Server Components by default — add 'use client' only when browser APIs or hooks are needed"
     severity: warning
 
-  - id: no-console-log
-    scope: "**/*.{ts,tsx,js,jsx}"
-    rule: "No console.log in production code"
-    severity: error
-
-  - id: imports-absolute
+  - id: next-no-useeffect-data-fetch
     scope: "**/*.{ts,tsx}"
-    rule: "Use absolute imports via tsconfig paths (@/), not relative imports"
+    rule: "Do not fetch data in useEffect — use Server Components or React Query"
     severity: error
 
-  - id: env-vars
-    scope: "**"
-    rule: "Public env vars must be prefixed NEXT_PUBLIC_. Never expose secrets client-side."
-    severity: error
-
-  - id: image-component
-    scope: "app/**"
+  - id: next-image-component
+    scope: "**/*.{ts,tsx}"
     rule: "Use next/image instead of <img> for all images"
+    severity: warning
+
+  - id: next-no-relative-imports-from-root
+    scope: "**/*.{ts,tsx}"
+    rule: "Use path aliases (@/components, @/lib) — no '../../../' relative imports beyond one level"
+    severity: warning
+
+  - id: next-env-prefix
+    scope: "**/*.{ts,tsx}"
+    rule: "Client-side env vars must be prefixed NEXT_PUBLIC_ — never expose server secrets to client"
+    severity: error
+
+  - id: next-no-default-export-in-lib
+    scope: "src/lib/**/*.{ts,tsx}"
+    rule: "Use named exports in lib/ — default exports only in page.tsx and layout.tsx"
+    severity: warning
+
+  - id: next-loading-error-boundaries
+    scope: "app/**"
+    rule: "Each route segment with async data must have a loading.tsx and error.tsx sibling"
     severity: warning

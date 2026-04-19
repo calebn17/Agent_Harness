@@ -1,5 +1,8 @@
+# Agent Harness Configuration — iOS/Swift template
+# Copy to .agent-harness/config.yaml and customize project.name and test_command.
+
 project:
-  name: "my-ios-swift-project"
+  name: "my-ios-project"
   type: ios-swift
 
 budgets:
@@ -17,8 +20,7 @@ memory:
   access_bump: 0.3
 
 tests:
-  test_command: "xcodebuild test -scheme MyScheme -destination 'platform=iOS Simulator,name=iPhone 15'"
-npm test"
+  test_command: "xcodebuild test -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16'"
   max_results: 20
   plan_location: "docs/plans/"
   auto_rules_check: true

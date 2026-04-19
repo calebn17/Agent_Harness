@@ -1,3 +1,6 @@
+# Agent Harness Configuration — Node.js template
+# Copy to .agent-harness/config.yaml and customize project.name.
+
 project:
   name: "my-node-project"
   type: node
@@ -17,7 +20,7 @@ memory:
   access_bump: 0.3
 
 tests:
-  test_command: "npm test"
+  test_command: "npx jest --no-coverage"
   max_results: 20
   plan_location: "docs/plans/"
   auto_rules_check: true
