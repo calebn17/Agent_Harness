@@ -7,7 +7,7 @@ from datetime import date
 import yaml
 
 HARNESS_DIR = Path(__file__).parent.parent.resolve()
-PROJECT_ROOT = HARNESS_DIR.parent
+PROJECT_ROOT = HARNESS_DIR.parent.parent
 LOCK_FILE = HARNESS_DIR / ".lock"
 CONFIG_FILE = HARNESS_DIR / "config.yaml"
 

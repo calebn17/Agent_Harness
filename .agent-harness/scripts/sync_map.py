@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 # Self-bootstrap when run directly (e.g., from git hooks)
 _scripts_dir = Path(__file__).parent.resolve()
@@ -26,9 +27,19 @@ from scripts.common import HARNESS_DIR, PROJECT_ROOT, load_config
 
 DETAIL_DIR = HARNESS_DIR / "context" / "detail"
 IGNORE_DIRS = {
-    ".git", ".agent-harness", "node_modules", "__pycache__",
-    ".venv", "venv", "env", "build", "dist", ".next", ".nuxt",
-    "DerivedData", "*.xcworkspace",
+    ".git",
+    ".agent-harness",
+    "node_modules",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "env",
+    "build",
+    "dist",
+    ".next",
+    ".nuxt",
+    "DerivedData",
+    "*.xcworkspace",
 }
 
 
@@ -36,7 +47,7 @@ def _should_ignore(path: Path) -> bool:
     return path.name in IGNORE_DIRS or path.name.startswith(".")
 
 
-def _count_files(directory: Path, extensions: set | None = None) -> int:
+def _count_files(directory: Path, extensions: Optional[set] = None) -> int:
     count = 0
     for f in directory.rglob("*"):
         if f.is_file():
@@ -106,7 +117,8 @@ def scan_full():
 
     # Top-level modules (immediate children of project root)
     top_dirs = [
-        d for d in sorted(PROJECT_ROOT.iterdir())
+        d
+        for d in sorted(PROJECT_ROOT.iterdir())
         if d.is_dir() and not _should_ignore(d)
     ]
 
@@ -132,7 +144,9 @@ def scan_incremental(dirs: list):
         d = PROJECT_ROOT / dir_path_str
         if not d.exists() or not d.is_dir():
             # Module deleted — remove detail file
-            for detail_file in DETAIL_DIR.glob(f"map-{dir_path_str.replace('/', '-')}*.md"):
+            for detail_file in DETAIL_DIR.glob(
+                f"map-{dir_path_str.replace('/', '-')}*.md"
+            ):
                 detail_file.unlink()
                 print(f"Removed stale map: {detail_file.name}")
             continue
