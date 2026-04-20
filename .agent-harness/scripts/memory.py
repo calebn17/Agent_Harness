@@ -5,6 +5,7 @@ import re
 import fnmatch
 from pathlib import Path
 from datetime import date, datetime
+from typing import Optional
 
 from scripts.common import (
     HARNESS_DIR, acquire_lock, release_lock, today_str,
@@ -27,7 +28,7 @@ def _next_entry_id(entries: list) -> str:
     return f"mem-{(max(nums) + 1):03d}" if nums else "mem-001"
 
 
-def _score_entry(entry: dict, topic: str | None, files: list | None, categories: list | None) -> float:
+def _score_entry(entry: dict, topic: Optional[str], files: Optional[list], categories: Optional[list]) -> float:
     """Keyword + file relevance score. Returns 0.0 if no match."""
     score = 0.0
 
@@ -58,8 +59,8 @@ def _score_entry(entry: dict, topic: str | None, files: list | None, categories:
     return score
 
 
-def memory_query(topic: str | None, files: list | None,
-                 categories: list | None = None, brief: bool = False):
+def memory_query(topic: Optional[str], files: Optional[list],
+                 categories: Optional[list] = None, brief: bool = False):
     cfg = load_config()
     budgets = cfg.get("budgets", {})
     max_entries = budgets.get("memory_query_max_entries", 5)
@@ -130,7 +131,7 @@ def _bump_relevance(entry_ids: list):
         release_lock(lock)
 
 
-def memory_save(category: str, content: str, files: list | None = None):
+def memory_save(category: str, content: str, files: Optional[list] = None):
     cfg = load_config()
     mem_cfg = cfg.get("memory", {})
     max_entries = mem_cfg.get("max_entries", 200)

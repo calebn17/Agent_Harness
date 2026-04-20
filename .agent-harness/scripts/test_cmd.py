@@ -3,6 +3,7 @@
 import json
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 from scripts.common import HARNESS_DIR, PROJECT_ROOT, load_config
 from scripts.parse_tests import parse_output
@@ -23,7 +24,7 @@ def run_tests():
     return parsed
 
 
-def query_results(path: str | None = None):
+def query_results(path: Optional[str] = None):
     if not TEST_RESULTS.exists():
         print("No test results stored yet.")
         return

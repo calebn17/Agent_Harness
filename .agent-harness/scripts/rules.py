@@ -4,6 +4,7 @@ import fnmatch
 import re
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
@@ -71,7 +72,7 @@ def _check_file(file_path: Path, rules: list) -> list[str]:
     return violations
 
 
-def rules_check(files: list | None = None, staged: bool = False):
+def rules_check(files: Optional[list] = None, staged: bool = False):
     if not CONVENTIONS_FILE.exists():
         print("No conventions.yaml found. Create rules/conventions.yaml first.")
         return

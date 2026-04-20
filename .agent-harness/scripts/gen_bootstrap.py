@@ -4,6 +4,7 @@ import hashlib
 import subprocess
 from datetime import date, datetime
 from pathlib import Path
+from typing import Optional
 
 from scripts.common import (
     HARNESS_DIR, PROJECT_ROOT, load_config, load_memory_index,
@@ -191,7 +192,7 @@ def _section_commands(role_cfg: dict) -> str:
     return "## Commands\n" + "\n".join(cmds) + "\n"
 
 
-def generate_bootstrap(role: str = "coder", worktree: str | None = None):
+def generate_bootstrap(role: str = "coder", worktree: Optional[str] = None):
     CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
 
     cfg = load_config()

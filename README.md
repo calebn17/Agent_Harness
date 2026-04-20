@@ -21,7 +21,7 @@ A lightweight harness that:
 ## Installation
 
 ```bash
-# Prerequisite
+# Prerequisite: Python 3.9+, pyyaml
 pip3 install pyyaml
 
 # Add as git submodule to your project
