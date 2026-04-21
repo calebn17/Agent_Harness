@@ -20,6 +20,44 @@ BLOCK_END = "<!-- agent-harness:role:end -->"
 
 AGENT_CONFIGS = ["CLAUDE.md", ".cursorrules", "AGENTS.md"]
 
+SKILLS_BLOCK_START = "<!-- agent-harness:skills:start -->"
+SKILLS_BLOCK_END = "<!-- agent-harness:skills:end -->"
+
+# Maps each agent config file to the role whose skills it should reference.
+# Claude Code = planner, Cursor = coder, Codex = reviewer.
+_FILE_SKILL_ROLE = {
+    "CLAUDE.md": "planner",
+    ".cursorrules": "coder",
+    "AGENTS.md": "reviewer",
+}
+
+_SKILLS_CONTENT = {
+    "planner": (
+        "## Agent Harness — Skills: planner\n\n"
+        "At the start of every session, read and follow "
+        "`.agent-harness/skills/planner/planner-start.md`.\n\n"
+        "Additional skills available when needed:\n"
+        "- Create a plan: `.agent-harness/skills/planner/create-plan.md`"
+    ),
+    "coder": (
+        "## Agent Harness — Skills: coder\n\n"
+        "At the start of every session, read and follow "
+        "`.agent-harness/skills/coder/coder-start.md`.\n\n"
+        "Additional skills available when needed:\n"
+        "- Pick up a code review: `.agent-harness/skills/coder/pick-up-review.md`\n"
+        "- Save a mistake to memory: `.agent-harness/skills/coder/save-mistake.md`\n"
+        "- Query memory for context: `.agent-harness/skills/coder/query-memory.md`\n"
+        "- Drill into a module map: `.agent-harness/skills/coder/drill-map.md`"
+    ),
+    "reviewer": (
+        "## Agent Harness — Skills: reviewer\n\n"
+        "At the start of every session, read and follow "
+        "`.agent-harness/skills/reviewer/reviewer-start.md`.\n\n"
+        "When your review is complete, read and follow "
+        "`.agent-harness/skills/reviewer/leave-review.md`."
+    ),
+}
+
 
 def _permission_lines(perms: dict) -> list[str]:
     lines = []
@@ -114,3 +152,33 @@ def inject_role_permissions(role_name: str, role_cfg: dict, project_root: Path):
     for config_name in AGENT_CONFIGS:
         config_path = project_root / config_name
         _inject_into_file(config_path, block)
+
+
+def _inject_skills_into_file(file_path: Path, block: str):
+    """Replace or append the skills block in a config file."""
+    pattern = re.compile(
+        re.escape(SKILLS_BLOCK_START) + r".*?" + re.escape(SKILLS_BLOCK_END),
+        re.DOTALL,
+    )
+    if file_path.exists():
+        content = file_path.read_text()
+        if pattern.search(content):
+            new_content = pattern.sub(block, content)
+        else:
+            new_content = content.rstrip() + "\n\n" + block + "\n"
+    else:
+        new_content = block + "\n"
+    file_path.write_text(new_content)
+
+
+def inject_skills_block(project_root: Path):
+    """Write role-specific skills references into each agent config file.
+
+    CLAUDE.md    → planner skills
+    .cursorrules → coder skills
+    AGENTS.md    → reviewer skills
+    """
+    for config_name, role in _FILE_SKILL_ROLE.items():
+        body = _SKILLS_CONTENT[role]
+        block = f"{SKILLS_BLOCK_START}\n{body}\n{SKILLS_BLOCK_END}"
+        _inject_skills_into_file(project_root / config_name, block)

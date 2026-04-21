@@ -124,3 +124,66 @@ def test_coder_tools_include_mistakes_and_rules(tmp_path):
     content = (tmp_path / "CLAUDE.md").read_text()
     assert "harness mistakes" in content
     assert "harness rules check" in content
+
+
+# --- skills block injection ---
+
+from scripts.permissions import inject_skills_block, SKILLS_BLOCK_START, SKILLS_BLOCK_END
+
+
+def test_skills_block_created_in_all_configs(tmp_path):
+    inject_skills_block(tmp_path)
+    for name in ["CLAUDE.md", ".cursorrules", "AGENTS.md"]:
+        content = (tmp_path / name).read_text()
+        assert SKILLS_BLOCK_START in content
+        assert SKILLS_BLOCK_END in content
+
+
+def test_claude_md_gets_planner_skills(tmp_path):
+    inject_skills_block(tmp_path)
+    content = (tmp_path / "CLAUDE.md").read_text()
+    assert "planner-start.md" in content
+    assert "create-plan.md" in content
+
+
+def test_cursorrules_gets_coder_skills(tmp_path):
+    inject_skills_block(tmp_path)
+    content = (tmp_path / ".cursorrules").read_text()
+    assert "coder-start.md" in content
+    assert "pick-up-review.md" in content
+    assert "save-mistake.md" in content
+    assert "query-memory.md" in content
+    assert "drill-map.md" in content
+
+
+def test_agents_md_gets_reviewer_skills(tmp_path):
+    inject_skills_block(tmp_path)
+    content = (tmp_path / "AGENTS.md").read_text()
+    assert "reviewer-start.md" in content
+    assert "leave-review.md" in content
+
+
+def test_skills_block_idempotent(tmp_path):
+    inject_skills_block(tmp_path)
+    inject_skills_block(tmp_path)
+    content = (tmp_path / "CLAUDE.md").read_text()
+    assert content.count(SKILLS_BLOCK_START) == 1
+
+
+def test_skills_block_preserved_with_existing_content(tmp_path):
+    claude_md = tmp_path / "CLAUDE.md"
+    claude_md.write_text("Read bootstrap.md before each task.\n")
+    inject_skills_block(tmp_path)
+    content = claude_md.read_text()
+    assert "Read bootstrap.md before each task." in content
+    assert SKILLS_BLOCK_START in content
+
+
+def test_skills_block_and_role_block_coexist(tmp_path):
+    inject_role_permissions("coder", CODER_CFG, tmp_path)
+    inject_skills_block(tmp_path)
+    content = (tmp_path / "CLAUDE.md").read_text()
+    assert BLOCK_START in content
+    assert SKILLS_BLOCK_START in content
+    assert content.count(SKILLS_BLOCK_START) == 1
+    assert content.count(BLOCK_START) == 1
