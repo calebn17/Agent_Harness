@@ -1,6 +1,13 @@
 """Tests for permissions.py: role block injection into agent config files."""
 
-from scripts.permissions import inject_role_permissions, BLOCK_START, BLOCK_END
+from scripts.permissions import (
+    inject_role_permissions,
+    inject_skills_block,
+    BLOCK_START,
+    BLOCK_END,
+    SKILLS_BLOCK_START,
+    SKILLS_BLOCK_END,
+)
 
 PLANNER_CFG = {
     "description": "Designs architecture and plans",
@@ -127,9 +134,6 @@ def test_coder_tools_include_mistakes_and_rules(tmp_path):
 
 
 # --- skills block injection ---
-
-from scripts.permissions import inject_skills_block, SKILLS_BLOCK_START, SKILLS_BLOCK_END
-
 
 def test_skills_block_created_in_all_configs(tmp_path):
     inject_skills_block(tmp_path)

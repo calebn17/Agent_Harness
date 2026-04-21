@@ -127,13 +127,12 @@ def _build_block(role_name: str, role_cfg: dict) -> str:
     return "\n".join(lines)
 
 
-def _inject_into_file(file_path: Path, block: str):
-    """Replace or append the role block in a config file."""
+def _inject_block_into_file(file_path: Path, block: str, start_marker: str, end_marker: str):
+    """Replace or append a tagged block in a config file."""
     pattern = re.compile(
-        re.escape(BLOCK_START) + r".*?" + re.escape(BLOCK_END),
+        re.escape(start_marker) + r".*?" + re.escape(end_marker),
         re.DOTALL,
     )
-
     if file_path.exists():
         content = file_path.read_text()
         if pattern.search(content):
@@ -142,7 +141,6 @@ def _inject_into_file(file_path: Path, block: str):
             new_content = content.rstrip() + "\n\n" + block + "\n"
     else:
         new_content = block + "\n"
-
     file_path.write_text(new_content)
 
 
@@ -151,24 +149,7 @@ def inject_role_permissions(role_name: str, role_cfg: dict, project_root: Path):
     block = _build_block(role_name, role_cfg)
     for config_name in AGENT_CONFIGS:
         config_path = project_root / config_name
-        _inject_into_file(config_path, block)
-
-
-def _inject_skills_into_file(file_path: Path, block: str):
-    """Replace or append the skills block in a config file."""
-    pattern = re.compile(
-        re.escape(SKILLS_BLOCK_START) + r".*?" + re.escape(SKILLS_BLOCK_END),
-        re.DOTALL,
-    )
-    if file_path.exists():
-        content = file_path.read_text()
-        if pattern.search(content):
-            new_content = pattern.sub(block, content)
-        else:
-            new_content = content.rstrip() + "\n\n" + block + "\n"
-    else:
-        new_content = block + "\n"
-    file_path.write_text(new_content)
+        _inject_block_into_file(config_path, block, BLOCK_START, BLOCK_END)
 
 
 def inject_skills_block(project_root: Path):
@@ -181,4 +162,4 @@ def inject_skills_block(project_root: Path):
     for config_name, role in _FILE_SKILL_ROLE.items():
         body = _SKILLS_CONTENT[role]
         block = f"{SKILLS_BLOCK_START}\n{body}\n{SKILLS_BLOCK_END}"
-        _inject_skills_into_file(project_root / config_name, block)
+        _inject_block_into_file(project_root / config_name, block, SKILLS_BLOCK_START, SKILLS_BLOCK_END)
