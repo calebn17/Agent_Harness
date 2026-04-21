@@ -7,21 +7,14 @@ HANDOFF_FILE = HARNESS_DIR / "context" / "session-handoff.md"
 
 
 def capture_handoff():
-    """Prompt the agent to write a handoff summary to session-handoff.md.
+    """Deprecated: handoff is now generated automatically by the post-commit hook.
 
-    In practice, the agent writes this file directly during the session.
-    This script validates the file exists and is non-empty.
+    This command is kept for backwards compatibility. The post-commit hook
+    writes .agent-harness/handoff/handoff.md after every commit, and
+    coder-start.md ingests and deletes it automatically.
     """
-    if not HANDOFF_FILE.exists() or not HANDOFF_FILE.read_text().strip():
-        template = (
-            "# Session Handoff\n\n"
-            "## Worked On\n- \n\n"
-            "## Decisions Made\n- \n\n"
-            "## In Progress\n- \n\n"
-            "## Blockers\n- \n"
-        )
-        HANDOFF_FILE.write_text(template)
-        print(f"Created handoff template at {HANDOFF_FILE}")
-        print("Fill it in before ending your session.")
-    else:
-        print(f"Handoff captured: {HANDOFF_FILE}")
+    print(
+        "Note: 'harness post' is deprecated. The post-commit hook now generates "
+        "the handoff automatically after each commit. "
+        "See .agent-harness/handoff/handoff.md if a handoff was recently written."
+    )
