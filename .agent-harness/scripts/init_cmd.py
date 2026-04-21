@@ -25,6 +25,10 @@ if [ -n "$changed_dirs" ]; then
   cd "$ROOT"
   PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/sync_map.py --only $changed_dirs
 fi
+
+# Agent Harness: generate session handoff
+cd "$ROOT"
+PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/handoff_cmd.py
 """
 
 POST_MERGE_HOOK = """\
@@ -90,6 +94,8 @@ def init_project(project_type: str = "python"):
         HARNESS_DIR / "memory" / "entries",
         HARNESS_DIR / "rules",
         HARNESS_DIR / "logs",
+        HARNESS_DIR / "reviews",
+        HARNESS_DIR / "handoff",
     ]
     for d in dirs:
         d.mkdir(parents=True, exist_ok=True)
@@ -126,6 +132,10 @@ def init_project(project_type: str = "python"):
     for config_file, line in AGENT_CONFIGS.items():
         _wire_agent_config(config_file, line)
 
+    # 7. Inject skills blocks into agent config files
+    from scripts.permissions import inject_skills_block
+    inject_skills_block(PROJECT_ROOT)
+    print("  Injected skills blocks into agent config files")
+
     print(f"\nHarness initialized for {project_type}.")
-    print("Run 'harness prep --role <role>' before each session.")
-    print("Roles: planner (Opus), coder (Sonnet/Composer2), reviewer (Codex)")
+    print("Skills are pre-wired. Agents will self-guide on session start.")
