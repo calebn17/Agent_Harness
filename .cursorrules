@@ -15,3 +15,15 @@ Available harness commands for this role:
 
 Read `.agent-harness/context/bootstrap.md` for full project context.
 <!-- agent-harness:role:end -->
+
+<!-- agent-harness:skills:start -->
+## Agent Harness — Skills: coder
+
+At the start of every session, read and follow `.agent-harness/skills/coder/coder-start.md`.
+
+Additional skills available when needed:
+- Pick up a code review: `.agent-harness/skills/coder/pick-up-review.md`
+- Save a mistake to memory: `.agent-harness/skills/coder/save-mistake.md`
+- Query memory for context: `.agent-harness/skills/coder/query-memory.md`
+- Drill into a module map: `.agent-harness/skills/coder/drill-map.md`
+<!-- agent-harness:skills:end -->

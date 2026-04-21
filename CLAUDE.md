@@ -15,3 +15,12 @@ Available harness commands for this role:
 
 Read `.agent-harness/context/bootstrap.md` for full project context.
 <!-- agent-harness:role:end -->
+
+<!-- agent-harness:skills:start -->
+## Agent Harness — Skills: planner
+
+At the start of every session, read and follow `.agent-harness/skills/planner/planner-start.md`.
+
+Additional skills available when needed:
+- Create a plan: `.agent-harness/skills/planner/create-plan.md`
+<!-- agent-harness:skills:end -->

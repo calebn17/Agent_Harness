@@ -15,3 +15,11 @@ Available harness commands for this role:
 
 Read `.agent-harness/context/bootstrap.md` for full project context.
 <!-- agent-harness:role:end -->
+
+<!-- agent-harness:skills:start -->
+## Agent Harness — Skills: reviewer
+
+At the start of every session, read and follow `.agent-harness/skills/reviewer/reviewer-start.md`.
+
+When your review is complete, read and follow `.agent-harness/skills/reviewer/leave-review.md`.
+<!-- agent-harness:skills:end -->
