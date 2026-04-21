@@ -8,6 +8,8 @@
 .agent-harness/logs/
 .agent-harness/scores/
 .agent-harness/.lock
+.agent-harness/reviews/
+.agent-harness/handoff/
 
 # Python
 __pycache__/
