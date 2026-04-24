@@ -27,11 +27,12 @@ pip3 install pyyaml
 # Add as git submodule to your project
 git submodule add <this-repo-url> .agent-harness
 
-# Initialize for your project type
+# Run from your PROJECT ROOT directory
+cd /path/to/your/project
 .agent-harness/harness init --type nextjs   # or python, ios-swift, node
 ```
 
-`harness init` will:
+`harness init` (run from project root) will:
 - Generate an initial codebase map
 - Install git hooks for incremental map updates and automatic handoff generation
 - Inject role-specific skills blocks into CLAUDE.md, .cursorrules, and AGENTS.md
