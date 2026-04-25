@@ -18,34 +18,67 @@ AGENT_CONFIGS = {
 }
 
 POST_COMMIT_HOOK = """\
-# Agent Harness: incremental codebase map update
+# Agent Harness: incremental codebase map update + session handoff
 ROOT=$(git rev-parse --show-toplevel)
-changed_dirs=$(git diff-tree --no-commit-id --name-only -r HEAD | cut -d/ -f1 | sort -u | tr '\\n' ' ')
-if [ -n "$changed_dirs" ]; then
-  cd "$ROOT"
-  PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/sync_map.py --only $changed_dirs
+
+# Find harness location (handle nested layouts)
+if [ -d "$ROOT/.agent-harness/.agent-harness" ]; then
+  HARNESS_DIR="$ROOT/.agent-harness/.agent-harness"
+else
+  HARNESS_DIR="$ROOT/.agent-harness"
 fi
 
-# Agent Harness: generate session handoff
-cd "$ROOT"
-PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/handoff_cmd.py
+# Map sync (skip if script not found)
+changed_dirs=$(git diff-tree --no-commit-id --name-only -r HEAD | cut -d/ -f1 | sort -u | tr '\\n' ' ')
+if [ -n "$changed_dirs" ] && [ -f "$HARNESS_DIR/scripts/sync_map.py" ]; then
+  PYTHONPATH="$HARNESS_DIR" python3 "$HARNESS_DIR/scripts/sync_map.py" --only $changed_dirs 2>/dev/null || true
+fi
+
+# Generate handoff (skip if script not found)
+if [ -f "$HARNESS_DIR/scripts/handoff_cmd.py" ]; then
+  PYTHONPATH="$HARNESS_DIR" python3 "$HARNESS_DIR/scripts/handoff_cmd.py" 2>/dev/null || true
+fi
 """
 
 POST_MERGE_HOOK = """\
 # Agent Harness: incremental codebase map update on merge
 ROOT=$(git rev-parse --show-toplevel)
+
+# Find harness location (handle nested layouts)
+if [ -d "$ROOT/.agent-harness/.agent-harness" ]; then
+  HARNESS_DIR="$ROOT/.agent-harness/.agent-harness"
+else
+  HARNESS_DIR="$ROOT/.agent-harness"
+fi
+
+# Skip if script not found
+if [ ! -f "$HARNESS_DIR/scripts/sync_map.py" ]; then
+  exit 0
+fi
+
 changed_dirs=$(git diff-tree --no-commit-id --name-only -r HEAD@{1} HEAD | cut -d/ -f1 | sort -u | tr '\\n' ' ')
 if [ -n "$changed_dirs" ]; then
-  cd "$ROOT"
-  PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/sync_map.py --only $changed_dirs
+  PYTHONPATH="$HARNESS_DIR" python3 "$HARNESS_DIR/scripts/sync_map.py" --only $changed_dirs 2>/dev/null || true
 fi
 """
 
 POST_CHECKOUT_HOOK = """\
 # Agent Harness: staleness check after branch switch
 ROOT=$(git rev-parse --show-toplevel)
-cd "$ROOT"
-PYTHONPATH="$ROOT/.agent-harness" python3 .agent-harness/scripts/sync_map.py --staleness-check
+
+# Find harness location (handle nested layouts)
+if [ -d "$ROOT/.agent-harness/.agent-harness" ]; then
+  HARNESS_DIR="$ROOT/.agent-harness/.agent-harness"
+else
+  HARNESS_DIR="$ROOT/.agent-harness"
+fi
+
+# Skip if script not found
+if [ ! -f "$HARNESS_DIR/scripts/sync_map.py" ]; then
+  exit 0
+fi
+
+PYTHONPATH="$HARNESS_DIR" python3 "$HARNESS_DIR/scripts/sync_map.py" --staleness-check 2>/dev/null || true
 """
 
 
